@@ -1,0 +1,8 @@
+{
+  "name": "Color Filters",
+  "description": "Apply a color filter to the whole screen",
+  "uuid": "colorfilter@def.lakaban.net",
+  "shell-version": [
+    "40"
+  ]
+}
