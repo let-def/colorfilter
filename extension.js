@@ -198,7 +198,7 @@ class Extension {
   }
 
   disable() {
-    fx_set(false);
+    this.fx_set(false);
     this._indicator.destroy();
     this._indicator = null;
     this.dfx.destroy();
