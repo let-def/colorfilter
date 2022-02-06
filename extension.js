@@ -63,9 +63,9 @@ class Indicator extends PanelMenu.Button {
           fx.fx_change_level(0.05);
         if (event.get_scroll_direction() == Clutter.ScrollDirection.DOWN)
           fx.fx_change_level(-0.05);
-        if (event.get_scroll_direction() == Clutter.ScrollDirection.RIGHT)
-          fx.fx_change_brightness(0.05);
         if (event.get_scroll_direction() == Clutter.ScrollDirection.LEFT)
+          fx.fx_change_brightness(0.05);
+        if (event.get_scroll_direction() == Clutter.ScrollDirection.RIGHT)
           fx.fx_change_brightness(-0.05);
       }
     ) 
@@ -125,19 +125,29 @@ class Extension {
     color.alpha = spec.alpha;
   }
 
+  map_brightness(x)
+  {
+    return (((x - 127) / 127) + this.brightness - 1.0) * this.level;
+  }
+
+  map_contrast(x)
+  {
+    return ((x - 127) / 127) * this.level;
+  }
+
   fx_update()
   {
     if (!this.theme) return;
     this.dfx.factor = this.level;
     this.bcfx.set_brightness_full(
-      ((this.theme[0].red   - 127) / 127) * this.level,
-      ((this.theme[0].green - 127) / 127) * this.level,
-      ((this.theme[0].blue  - 127) / 127) * this.level
+      this.map_brightness(this.theme[0].red),
+      this.map_brightness(this.theme[0].green),
+      this.map_brightness(this.theme[0].blue)
     );
     this.bcfx.set_contrast_full(
-      ((this.theme[1].red   - 127) / 127) * this.level, 
-      ((this.theme[1].green - 127) / 127) * this.level,
-      ((this.theme[1].blue  - 127) / 127) * this.level
+      this.map_contrast(this.theme[1].red),
+      this.map_contrast(this.theme[1].green),
+      this.map_contrast(this.theme[1].blue)
     );
   }
 
@@ -153,13 +163,25 @@ class Extension {
     return result;
   }
 
+  clamp(x)
+  {
+    if (x < 0.0)
+      return 0.0;
+    else if (x > 1.0)
+      return 1.0;
+    else
+      return x;
+  }
+
+  fx_change_brightness(delta)
+  {
+    this.brightness = this.clamp(this.brightness + delta);
+    this.fx_update();
+  }
+
   fx_change_level(delta)
   {
-    this.level += delta;
-    if (this.level < 0.0) 
-      this.level = 0.0;
-    if (this.level > 1.0) 
-      this.level = 1.0;
+    this.level = this.clamp(this.level + delta);
     this.fx_update();
   }
 
@@ -168,6 +190,7 @@ class Extension {
     this.bcfx = new Clutter.BrightnessContrastEffect();
     this.enabled = false;
     this.level = 1.0;
+    this.brightness = 1.0;
     this.theme = null;
 
     this._indicator = new Indicator(this);
