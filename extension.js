@@ -201,10 +201,6 @@ class Extension {
     this.fx_set(false);
     this._indicator.destroy();
     this._indicator = null;
-    this.dfx.destroy();
-    this.dfx = null;
-    this.bcfx.destroy();
-    this.bcfx = null;
   }
 }
 
